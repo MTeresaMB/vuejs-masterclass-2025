@@ -1,8 +1,8 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <main>
-    
-  </main>
+  <div>
+    <h1>Home Page</h1>
+    <RouterLink to="/projects">Go to Projects Page</RouterLink>
+  </div>
 </template>
