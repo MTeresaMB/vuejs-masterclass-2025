@@ -1,6 +1,4 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div>
@@ -8,5 +6,3 @@
     <RouterLink to="/">Go to Home Page</RouterLink>
   </div>
 </template>
-
-
