@@ -6,50 +6,129 @@ export const supabase = createClient(
   process.env.SERVICE_ROLE_KEY
 )
 
-const seedProjects = async(numEntries) => {
-  try {
-    const projects = Array.from({ length: numEntries }, () => createProject());
-    const { data, error } = await supabase
-      .from('projects')
-      .insert(projects)
+const config = {
+  projects_count: 10,
+  tasks_per_project: { min: 5, max: 15 },
+  collaborators: ['user1', 'user2', 'user3', 'user4', 'user5'],
+  status_options: ['in_progress', 'completed'],
+  batch_size: 100,
+}
 
-    if (error) {
-      throw error;
-    }
-    console.log(`Inserted ${data?.length} projects successfully.`);
-    return true;
-  } catch (error) {
-    console.error('Error seeding projects:', error);
-    return false;
-  }
-};
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+const generateRandomSlug = (name) => {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
+
+const selectRandomCollaborators = (min, max) => {
+  return faker.helpers.arrayElements(collaborators, { min, max });
+}
+
+const selectRandomStatus = () => {
+  return faker.helpers.arrayElement(config.status_options);
+}
 
 const createProject = () => {
-  const name = faker.lorem.words(3);
-
+  const name = faker.company.name();
   return {
-    name: name,
-    slug: name.toLowerCase().replace(/\s+/g, '-'),
-    status: faker.helpers.arrayElement(['in_progress', 'completed']),
-    collaborators: faker.helpers.arrayElements(
-      ['user1', 'user2', 'user3', 'user4', 'user5'],
-      { min: 1, max: 3 }
-    ),
+    name,
+    slug: generateRandomSlug(name),
+    status: selectRandomStatus(),
+    collaborators: selectRandomCollaborators(1, 3),
   };
-};
+}
 
-const runSeed = async () => {
-  const success = await seedProjects(10);
-  if (success) {
-    console.log('Seeding completed successfully.');
+const createTask = (projectId) => ({
+  project_id: projectId,
+  name: faker.hacker.noun(),
+  description: faker.lorem.paragraph({ min: 1, max: 3 }),
+  status: selectRandomStatus(),
+  due_date: faker.date.between({
+    from: new Date(),
+    to: faker.date.future(),
+  }),
+  collaborators: selectRandomCollaborators(1, 2),
+})
+
+
+const seedProjects = async (count) => {
+  const projects = Array.from({ length: count }, createProject);
+  const { data, error } = await supabase
+    .from('projects')
+    .insert(projects)
+    .select();
+
+  if (error) {
+    console.error('Error inserting projects:', error);
   } else {
-    console.error('Seeding failed.');
-    process.exit(1);
+    console.log(`Inserted ${data.length} projects`);
   }
-};
+  return data;
+}
 
-runSeed().catch((error) => {
-  console.error('Error running seed script:', error);
-  process.exit(1);
-});
-//Insert Bulk Entries Into Supabase Database
+const seedTasksForProject = async (projectId, taskCount) => {
+  const tasks = Array.from({ length: taskCount}, () => createTask(projectId));
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert(tasks)
+    .select('id');
+
+  if (error) {
+    console.error(`Error inserting tasks for project ${projectId}:`, error);
+  } else {
+    console.log(`Inserted ${data.length} tasks for project ${projectId}`);
+  }
+  return data.length;
+}
+
+const seedAllTasks = async (projectIds) => {
+  const taskPromises = projectIds.map(({ id, name }) => {
+    const taskCount = randomInt(config.tasks_per_project.min, config.tasks_per_project.max);
+    return seedTasksForProject(id, taskCount)
+    .then(count => {
+      console.log(`${count} tasks created for "${name}"`);
+      return count;
+    });
+  });
+
+  const results = await Promise.all(taskPromises);
+  const totalTasks = results.reduce((sum, count) => sum + count, 0);
+
+  console.log(`Total tasks created: ${totalTasks}`);
+  return totalTasks;
+}
+
+const runSeeding = async () => {
+  const startTime = Date.now();
+
+  try {
+    console.log('Starting seeding process...');
+    const projects = await seedProjects(config.projects_count);
+    if (projects.length === 0) {
+      console.log('No projects created, exiting.');
+      return;
+    }
+    await seedAllTasks(projects);
+
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+    console.log(`Seeding completed successfully in ${duration} seconds.`);
+
+  } catch (error) {
+    console.error('Error during seeding process:', error);
+  } finally {
+    const endTime = Date.now();
+    console.log(`Seeding process completed in ${endTime - startTime}ms`);
+  }
+}
+
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  runSeeding()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Seeding failed:', error);
+    process.exit(1);
+  });
+}
+
+export { runSeeding, seedProjects, seedAllTasks }
