@@ -1,22 +1,21 @@
 <script setup lang="ts">
-import { supabase } from '@/lib/supaBaseClient';
-import { ref } from 'vue';
-import type { Tables } from '../../../database/types';
+import { supabase } from "@/lib/supaBaseClient";
+import { ref } from "vue";
+import type { Tables } from "../../../database/types";
 
-const projects = ref<Tables<'projects'>[]>([]);
+const projects = ref<Tables<"projects">[]>([]);
 
-;(async () => {
-  const { data, error } = await supabase.from('projects').select('*');
+(async () => {
+  const { data, error } = await supabase.from("projects").select("*");
   if (error) {
-    console.error('Error fetching projects:', error);
+    console.error("Error fetching projects:", error);
   } else {
-    console.log('Projects data:', data);
+    console.log("Projects data:", data);
   }
 
   projects.value = data || [];
   return data;
 })();
-
 </script>
 
 <template>
@@ -34,5 +33,3 @@ const projects = ref<Tables<'projects'>[]>([]);
     </ul>
   </div>
 </template>
-
-//Create a New Page for Tasks with Database Migration, Seed and Types
