@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { BaseAvatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BaseInput } from "./components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 </script>
 
 <template>
@@ -7,7 +16,22 @@ import { BaseInput } from "./components/ui/input";
     <form class="w-full max-w-96">
       <BaseInput type="text" placeholder="Search..." class="w-full pl-8 bg-background" />
     </form>
-    <div class="w-8 h-8 rounded-full bg-white"></div>
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <BaseAvatar>
+          <AvatarImage src="https://github.com/unovue.png" />
+          <AvatarFallback>AB</AvatarFallback>
+        </BaseAvatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Billing</DropdownMenuItem>
+        <DropdownMenuItem>Team</DropdownMenuItem>
+        <DropdownMenuItem>Subscription</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   </nav>
   <main>
     <RouterView />
