@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { supabase } from "@/lib/supaBaseClient";
-import { ref } from "vue";
+import { h, ref } from "vue";
 import type { Tables } from "../../../database/types";
+import type { ColumnDef } from "@tanstack/vue-table";
+import DataTable from "@/components/ui/data-table/DataTable.vue";
+import { RouterLink } from "vue-router";
 
 const projects = ref<Tables<"projects">[]>([]);
 
@@ -16,20 +19,50 @@ const projects = ref<Tables<"projects">[]>([]);
   projects.value = data || [];
   return data;
 })();
+
+const columns: ColumnDef<Tables<"projects">>[] = [
+  {
+    accessorKey: "name",
+    header: () => h("div", { class: "text-left" }, "Name"),
+    cell: ({ row }) => {
+      return h(
+        RouterLink,
+        {
+          to: `/projects/${row.original.id}`,
+          class: "text-left font-medium hover:bg-muted block w-full",
+        },
+        () => row.getValue("name")
+      );
+    },
+  },
+  {
+    accessorKey: "slug",
+    header: () => h("div", { class: "text-left" }, "Slug"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("slug"));
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => h("div", { class: "text-left" }, "Status"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("status"));
+    },
+  },
+  {
+    accessorKey: "collaborators",
+    header: () => h("div", { class: "text-left" }, "Collaborators"),
+    cell: ({ row }) => {
+      return h(
+        "div",
+        { class: "text-left" },
+        JSON.stringify(row.getValue("collaborators"))
+      );
+    },
+  },
+];
 </script>
 
 <template>
-  <div>
-    <h1>Projects Page</h1>
-    <RouterLink to="/">Go to Home Page</RouterLink>
-
-    <ul>
-      <li v-for="project in projects" :key="project.id">
-        {{ project.id }}
-        {{ project.name }}
-        {{ project.slug }}
-        {{ project.status }}
-      </li>
-    </ul>
-  </div>
+  <DataTable v-if="projects" :columns="columns" :data="projects" />
 </template>

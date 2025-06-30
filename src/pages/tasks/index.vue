@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { supabase } from "@/lib/supaBaseClient";
-import { ref } from "vue";
+import { ref, h } from "vue";
 import type { Tables } from "../../../database/types";
+import type { ColumnDef } from "@tanstack/vue-table";
+import DataTable from "@/components/ui/data-table/DataTable.vue";
+import { RouterLink } from "vue-router";
 
 const tasks = ref<Tables<"tasks">[]>([]);
 
@@ -16,18 +19,70 @@ const tasks = ref<Tables<"tasks">[]>([]);
   tasks.value = data || [];
   return data;
 })();
+
+const columns: ColumnDef<Tables<"tasks">>[] = [
+  {
+    accessorKey: "name",
+    header: () => h("div", { class: "text-left" }, "Name"),
+    cell: ({ row }) => {
+      return h(
+        RouterLink,
+        { to: `/tasks/${row.original.id}`, class: "text-left font-medium" },
+        () => row.getValue("name")
+      );
+    },
+  },
+  {
+    accessorKey: "description",
+    header: () => h("div", { class: "text-left" }, "Description"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("description"));
+    },
+  },
+  {
+    accessorKey: "status",
+    header: () => h("div", { class: "text-left" }, "Status"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("status"));
+    },
+  },
+  {
+    accessorKey: "collaborators",
+    header: () => h("div", { class: "text-left" }, "Collaborators"),
+    cell: ({ row }) => {
+      return h(
+        "div",
+        { class: "text-left" },
+        JSON.stringify(row.getValue("collaborators"))
+      );
+    },
+  },
+  {
+    accessorKey: "created_at",
+    header: () => h("div", { class: "text-left" }, "Created At"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("created_at"));
+    },
+  },
+  {
+    accessorKey: "due_date",
+    header: () => h("div", { class: "text-left" }, "Due Date"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("due_date"));
+    },
+  },
+  {
+    accessorKey: "project_id",
+    header: () => h("div", { class: "text-left" }, "Project"),
+    cell: ({ row }) => {
+      return h("div", { class: "text-left" }, row.getValue("project_id"));
+    },
+  },
+];
 </script>
 
 <template>
   <div>
-    <h1>Tasks Page</h1>
-    <RouterLink to="/">Go to Home Page</RouterLink>
-
-    <ul>
-      <li v-for="task in tasks" :key="task.id">
-        {{ task.id }}
-        {{ task.name }}
-      </li>
-    </ul>
+    <DataTable v-if="tasks" :columns="columns" :data="tasks" />
   </div>
 </template>
