@@ -6,6 +6,7 @@ import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer';
 import AutoImport from 'unplugin-auto-import/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
+import Components from 'unplugin-vue-components/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -30,7 +31,7 @@ export default defineConfig({
         /\.vue\?vue/, // .vue
         /\.md$/ // .md
       ],
-      imports: ['vue', 'vue-router', VueRouterAutoImports,
+      imports: ['vue', VueRouterAutoImports,
         {
           'vue-router': [
             'RouterLink',
@@ -42,6 +43,20 @@ export default defineConfig({
         }],
       dts: true,
       viteOptimizeDeps: true
+    }),
+    Components({
+      dirs: ['src/components'],
+      extensions: ['vue'],
+      include: [/\.vue$/, /\.vue\?vue/],
+      dts: true,
+      directoryAsNamespace: true,
+      deep: true,
+      types: [
+        {
+          from: 'vue-router',
+          names: ['RouterLink', 'RouterView']
+        }
+      ],
     }),
   ],
   resolve: {
