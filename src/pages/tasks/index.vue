@@ -2,7 +2,6 @@
 import { supabase } from "@/lib/supaBaseClient";
 import type { Tables } from "../../../database/types";
 import type { ColumnDef } from "@tanstack/vue-table";
-import DataTable from "@/components/ui/data-table/DataTable.vue";
 
 const tasks = ref<Tables<"tasks">[]>([]);
 
