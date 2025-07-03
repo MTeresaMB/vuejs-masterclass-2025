@@ -49,8 +49,6 @@ export default defineConfig({
       extensions: ['vue'],
       include: [/\.vue$/, /\.vue\?vue/],
       dts: true,
-      directoryAsNamespace: true,
-      deep: true,
       types: [
         {
           from: 'vue-router',
