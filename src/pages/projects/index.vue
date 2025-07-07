@@ -5,17 +5,15 @@ import type { ColumnDef } from "@tanstack/vue-table";
 
 const projects = ref<Tables<"projects">[]>([]);
 
-(async () => {
+const getProjects = async () => {
   const { data, error } = await supabase.from("projects").select("*");
-  if (error) {
-    console.error("Error fetching projects:", error);
-  } else {
-    console.log("Projects data:", data);
-  }
+  if (error) console.error("Error fetching projects:", error);
 
   projects.value = data || [];
   return data;
-})();
+};
+
+await getProjects();
 
 const columns: ColumnDef<Tables<"projects">>[] = [
   {

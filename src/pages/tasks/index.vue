@@ -5,7 +5,7 @@ import type { ColumnDef } from "@tanstack/vue-table";
 
 const tasks = ref<Tables<"tasks">[]>([]);
 
-(async () => {
+const getTasks = async () => {
   const { data, error } = await supabase.from("tasks").select("*");
   if (error) {
     console.error("Error fetching tasks:", error);
@@ -15,7 +15,9 @@ const tasks = ref<Tables<"tasks">[]>([]);
 
   tasks.value = data || [];
   return data;
-})();
+};
+
+await getTasks();
 
 const columns: ColumnDef<Tables<"tasks">>[] = [
   {
