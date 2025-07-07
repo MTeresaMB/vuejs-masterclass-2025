@@ -3,15 +3,13 @@ import { supabase } from "@/lib/supaBaseClient";
 import type { Tables } from "../../../database/types";
 import type { ColumnDef } from "@tanstack/vue-table";
 
+usePageStore().pageData.title = "My Tasks";
+
 const tasks = ref<Tables<"tasks">[]>([]);
 
 const getTasks = async () => {
   const { data, error } = await supabase.from("tasks").select("*");
-  if (error) {
-    console.error("Error fetching tasks:", error);
-  } else {
-    console.log("Tasks data:", data);
-  }
+  if (error) console.error("Error fetching tasks:", error);
 
   tasks.value = data || [];
   return data;

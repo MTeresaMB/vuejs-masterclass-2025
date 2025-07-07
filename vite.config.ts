@@ -40,9 +40,18 @@ export default defineConfig({
             'useRoute',
             'useLink'
           ]
-        }],
+        },
+        {
+          'pinia': [
+            'defineStore',
+            'storeToRefs',
+            'acceptHMRUpdate'
+          ]
+        },
+      ],
       dts: true,
-      viteOptimizeDeps: true
+      viteOptimizeDeps: true,
+      dirs: ['src/stores'],
     }),
     Components({
       dirs: ['src/components'],
