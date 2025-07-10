@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { supabase } from "@/lib/supaBaseClient";
-import type { Tables } from "../../../database/types";
-import type { ColumnDef } from "@tanstack/vue-table";
+import { columns } from "@/utils/tableColumns/projectsColumns";
+import { projectsQuery } from "@/utils/supaQueries";
+import type { Projects } from "@/utils/supaQueries";
 
 usePageStore().pageData.title = "Projects";
 
-const projects = ref<Tables<"projects">[]>([]);
+const projects = ref<Projects | null>(null);
 
 const getProjects = async () => {
-  const { data, error } = await supabase.from("projects").select("*");
+  const { data, error } = await projectsQuery;
   if (error) console.error("Error fetching projects:", error);
 
   projects.value = data || [];
@@ -16,48 +16,6 @@ const getProjects = async () => {
 };
 
 await getProjects();
-
-const columns: ColumnDef<Tables<"projects">>[] = [
-  {
-    accessorKey: "name",
-    header: () => h("div", { class: "text-left" }, "Name"),
-    cell: ({ row }) => {
-      return h(
-        RouterLink,
-        {
-          to: `/projects/${row.original.id}`,
-          class: "text-left font-medium hover:bg-muted block w-full",
-        },
-        () => row.getValue("name")
-      );
-    },
-  },
-  {
-    accessorKey: "slug",
-    header: () => h("div", { class: "text-left" }, "Slug"),
-    cell: ({ row }) => {
-      return h("div", { class: "text-left" }, row.getValue("slug"));
-    },
-  },
-  {
-    accessorKey: "status",
-    header: () => h("div", { class: "text-left" }, "Status"),
-    cell: ({ row }) => {
-      return h("div", { class: "text-left" }, row.getValue("status"));
-    },
-  },
-  {
-    accessorKey: "collaborators",
-    header: () => h("div", { class: "text-left" }, "Collaborators"),
-    cell: ({ row }) => {
-      return h(
-        "div",
-        { class: "text-left" },
-        JSON.stringify(row.getValue("collaborators"))
-      );
-    },
-  },
-];
 </script>
 
 <template>
