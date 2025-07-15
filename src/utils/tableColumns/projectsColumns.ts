@@ -9,7 +9,7 @@ export const columns: ColumnDef<Projects[0]>[] = [
       return h(
         RouterLink,
         {
-          to: `/projects/${row.original.id}`,
+          to: `/projects/${row.original.slug}`,
           class: "text-left font-medium hover:bg-muted block w-full",
         },
         () => row.getValue("name")
