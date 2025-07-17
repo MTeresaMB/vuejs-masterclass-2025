@@ -42,10 +42,6 @@ await getTask();
       <TableHead> Description </TableHead>
       <TableCell>
         {{ task.description }}
-        nihil, ab reprehenderit dolorem sunt veritatis perferendis? Repudiandae quis velit
-        quasi ab natus quia ratione voluptas deserunt labore sed distinctio nam fuga fugit
-        vero voluptates placeat aperiam, saepe excepturi eos harum consectetur doloremque
-        perspiciatis nesciunt! Incidunt, modi.
       </TableCell>
     </TableRow>
     <TableRow>
